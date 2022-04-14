@@ -1,6 +1,6 @@
 # ImageCollection App
 
-![ImageCollection](https://github.com/arseniydor/ImageCollectionView/blob/main/Images/image1.png)
+![ImageCollection](https://github.com/arseniydor/ImageCollectionView/blob/main/Images/image1.png =300x649)
 
 ## Description
 
