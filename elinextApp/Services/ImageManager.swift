@@ -8,16 +8,16 @@
 import Foundation
 
 public class ImageManager {
-    private init() {}
+    init() {}
 
     static let shared = ImageManager()
 
-    private let concurrentPhotoQueue = DispatchQueue(label: "imageQueue", attributes: .concurrent)
+    private let concurrentImageQueue = DispatchQueue(label: "imageQueue", attributes: .concurrent)
     private var unsafeImages: [ImageModel] = []
 
     public var images: [ImageModel] {
         var imagesCopy: [ImageModel] = []
-        concurrentPhotoQueue.sync {
+        concurrentImageQueue.sync {
             imagesCopy = self.unsafeImages
         }
         return imagesCopy
@@ -64,7 +64,7 @@ public class ImageManager {
     }
 
     private func putImage(_ photo: ImageModel) {
-        concurrentPhotoQueue.async(flags: .barrier) { [weak self] in
+        concurrentImageQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             self.unsafeImages.append(photo)
             self.postContentAddedNotification()

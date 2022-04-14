@@ -9,7 +9,7 @@ import Foundation
 
 public class NetworkService {
     
-    public init() {}
+    init() {}
     private let configuration: URLSessionConfiguration = .default
     private lazy var urlSession: URLSession = .init(configuration: configuration)
     

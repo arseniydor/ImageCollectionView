@@ -110,7 +110,7 @@ class ImagesCollectionViewController: UIViewController {
 
 extension ImagesCollectionViewController {
     @objc
-    func contentChangedNotification(_ notification: Notification!) {
+    func contentChangedNotification() {
         updateCollectionView()
     }
 }

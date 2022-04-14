@@ -12,7 +12,7 @@ public class ImageService {
     private let imageLoadUrl: String = "https://loremflickr.com/200/200"
     private let networkService: NetworkService = NetworkService()
     
-    public init() {}
+    init() {}
     
     public func retrieveImage(completion: @escaping (Result<ImageModel, NetworkError>) -> Void) {
         networkService.fetchData(from: URL(string: imageLoadUrl)) { result in
