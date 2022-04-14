@@ -1,6 +1,6 @@
 # ImageCollection App
 
-![ImageCollection](https://github.com/arseniydor/ImageCollectionView/tree/main/images/image1.png)
+![ImageCollection](https://github.com/arseniydor/ImageCollectionView/blob/main/Images/image1.png)
 
 ## Description
 
