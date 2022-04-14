@@ -9,19 +9,16 @@ import SnapKit
 import UIKit
 
 class ImagesCollectionViewController: UIViewController {
-    // MARK: Private
 
-    private var service: ImageService = ImageService()
-    private var images: [UIImage?] = []
-
-    // MARK: ColletionView layout setup
+    // MARK: Properities
 
     private let imagesCount: Int = 140
     private let itemsCountInLine: CGFloat = 7
     private let itemsCountInColumn: CGFloat = 10
     private let itemsPadding: CGFloat = 2
+    private let imageManager = ImageManager.shared
 
-    // MARK: UI views
+    // MARK: UI Views
 
     private lazy var collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -30,14 +27,6 @@ class ImagesCollectionViewController: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.isPagingEnabled = true
         return collectionView
-    }()
-    
-    private lazy var activityIndicatorView: UIActivityIndicatorView = {
-        let activityView = UIActivityIndicatorView()
-        activityView.color = .red
-        activityView.style = .large
-        activityView.startAnimating()
-        return activityView
     }()
 
     private lazy var addBarButton: UIBarButtonItem = {
@@ -57,22 +46,20 @@ class ImagesCollectionViewController: UIViewController {
         layoutUI()
         configureNavBar()
         configureCollectionView()
+        addObservers()
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         loadData()
     }
 
+    // MARK: Initialization functions
+    
     private func layoutUI() {
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        }
-        
-        view.addSubview(activityIndicatorView)
-        activityIndicatorView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
         }
     }
 
@@ -86,51 +73,45 @@ class ImagesCollectionViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: "ImageCollectionViewCell")
     }
+    
+    private func addObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(contentChangedNotification),
+            name: .imagesCollectionViewUpdate,
+            object: nil)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(contentChangedNotification),
+            name: .imagesAddedCollectionView,
+            object: nil)
+    }
 
     private func loadData() {
-        startLoading()
-        service.retrieveImages(count: imagesCount) { [weak self] result in
+        imageManager.downloadImages(imagesCount: imagesCount) { [weak self] error in
             guard let self = self else { return }
-            switch result {
-            case .success(let images):
-                self.images = images
-                self.updateCollectionView()
-            case .failure(let error):
+            if let error = error {
                 self.showError(error: error)
             }
         }
     }
     
     private func updateCollectionView() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.collectionView.reloadData()
-            self.stopLoading()
-        }
+        self.collectionView.reloadData()
     }
-    
+
     private func showError(error: NetworkError) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.showAlert(title: "Ошибка", message: error.errorDescription)
-            self.stopLoading()
-        }
+        self.showAlert(title: "Ошибка", message: error.errorDescription)
     }
 }
 
-// MARK: ActivityView Actions
+// MARK: - Notification handlers
 
 extension ImagesCollectionViewController {
-    private func startLoading() {
-        self.reloadBarButton.isEnabled = false
-        self.addBarButton.isEnabled = false
-        self.activityIndicatorView.isHidden = false
-    }
-    
-    private func stopLoading() {
-        self.reloadBarButton.isEnabled = true
-        self.addBarButton.isEnabled = true
-        self.activityIndicatorView.isHidden = true
+    @objc
+    func contentChangedNotification(_ notification: Notification!) {
+        updateCollectionView()
     }
 }
 
@@ -139,14 +120,9 @@ extension ImagesCollectionViewController {
 extension ImagesCollectionViewController {
     @objc
     private func didTapAddBarButton() {
-        startLoading()
-        service.retrieveImage { [weak self] result in
+        imageManager.addNewImage { [weak self] error in
             guard let self = self else { return }
-            switch result {
-            case let .success(image):
-                self.images.append(image)
-                self.updateCollectionView()
-            case let .failure(error):
+            if let error = error {
                 self.showError(error: error)
             }
         }
@@ -154,6 +130,7 @@ extension ImagesCollectionViewController {
 
     @objc
     private func didTapReloadBarButton() {
+        imageManager.clearImages()
         loadData()
     }
 }
@@ -166,14 +143,14 @@ extension ImagesCollectionViewController: UICollectionViewDelegate, UICollection
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        images.count
+        imageManager.images.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCollectionViewCell", for: indexPath) as? ImageCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let currentItem = images[indexPath.row]
+        let currentItem = imageManager.images[indexPath.row]
         cell.configure(image: currentItem)
         return cell
     }

@@ -16,6 +16,13 @@ class ImageCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
+    private lazy var activityIndicatorView: UIActivityIndicatorView = {
+        let activityView = UIActivityIndicatorView()
+        activityView.color = .black
+        activityView.style = .medium
+        return activityView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutUI()
@@ -31,6 +38,11 @@ class ImageCollectionViewCell: UICollectionViewCell {
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        addSubview(activityIndicatorView)
+        activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
     }
 
     private func styleUI() {
@@ -39,7 +51,17 @@ class ImageCollectionViewCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
     }
     
-    public func configure(image: UIImage?) {
-        imageView.image = image
+    public func configure(image: ImageModel) {
+        switch image.statusImage {
+        case .downloaded:
+            activityIndicatorView.stopAnimating()
+            imageView.image = image.image
+        case .failed:
+            activityIndicatorView.stopAnimating()
+            imageView.image = UIImage(named: "errorImage")
+        case .loading:
+            imageView.image = nil
+            activityIndicatorView.startAnimating()
+        }
     }
 }
