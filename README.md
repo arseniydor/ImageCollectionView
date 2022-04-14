@@ -9,8 +9,11 @@ App which load images and add it in collection view.
 ## Technologies 
 
 Swift Package Manager
+
 UIKit
+
 SnapKit
+
 DispathcQueue
 
 ## Author
