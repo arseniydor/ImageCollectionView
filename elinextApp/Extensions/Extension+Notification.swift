@@ -8,6 +8,6 @@
 import Foundation
 
 extension Notification.Name {
-    static let imagesAddedCollectionView = Notification.Name("imagesAddedCollectionView")
-    static let imagesCollectionViewUpdate = Notification.Name("imagesCollectionViewUpdate")
+    static let imagesAddedCollectionView = Notification.Name("Avsi.elinextApp.imagesAddedCollectionView")
+    static let imagesCollectionViewUpdate = Notification.Name("Avsi.elinextApp.imagesCollectionViewUpdate")
 }

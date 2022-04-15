@@ -12,7 +12,7 @@ public class ImageManager {
 
     static let shared = ImageManager()
 
-    private let concurrentImageQueue = DispatchQueue(label: "imageQueue", attributes: .concurrent)
+    private let concurrentImageQueue = DispatchQueue(label: "Avsi.elinextApp.imageQueue", attributes: .concurrent)
     private var unsafeImages: [ImageModel] = []
 
     public var images: [ImageModel] {
