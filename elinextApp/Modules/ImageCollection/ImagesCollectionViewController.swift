@@ -11,10 +11,10 @@ import UIKit
 class ImagesCollectionViewController: UIViewController {
 
     // MARK: Properities
-
     private let imagesCount: Int = 140
     private let itemsCountInLine: CGFloat = 7
     private let itemsCountInColumn: CGFloat = 10
+    private lazy var itemsCountOnPage: Int = Int(itemsCountInLine*itemsCountInColumn)
     private let itemsPadding: CGFloat = 2
     private let imageManager = ImageManager.shared
 
@@ -139,19 +139,29 @@ extension ImagesCollectionViewController {
 
 extension ImagesCollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        1
+        let count = imageManager.images.count
+        if count%itemsCountOnPage == 0 {
+            return count/itemsCountOnPage
+        } else {
+            return count/itemsCountOnPage + 1
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        imageManager.images.count
+        itemsCountOnPage
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCollectionViewCell", for: indexPath) as? ImageCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let currentItem = imageManager.images[indexPath.row]
-        cell.configure(image: currentItem)
+        let itemIndex = indexPath.section*itemsCountOnPage + indexPath.row
+        if imageManager.images.count > itemIndex {
+            let currentItem = imageManager.images[itemIndex]
+            cell.configure(image: currentItem)
+        } else {
+            cell.configure(image: nil)
+        }
         return cell
     }
 }

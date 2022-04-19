@@ -51,7 +51,12 @@ class ImageCollectionViewCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
     }
     
-    public func configure(image: ImageModel) {
+    public func configure(image: ImageModel?) {
+        guard let image = image else {
+            imageView.image = nil
+            activityIndicatorView.stopAnimating()
+            return
+        }
         switch image.statusImage {
         case .downloaded:
             activityIndicatorView.stopAnimating()
